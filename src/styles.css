@@ -165,7 +165,12 @@ h1, h2, h3 {
 /* ---------- HERO ---------- */
 .hero-section {
   position: relative;
-  padding: 48px 0 140px;
+  min-height: calc(100vh - 100px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 0 100px;
   text-align: center;
 }
 
@@ -174,7 +179,7 @@ h1, h2, h3 {
   max-width: 920px;
   font-size: clamp(40px, 6.4vw, 80px);
   font-weight: 800;
-  line-height: 1.06;
+  line-height: 100px;
   letter-spacing: -0.025em;
 }
 
@@ -271,8 +276,8 @@ h1, h2, h3 {
 
 .hero-scroll {
   position: absolute;
-  bottom: 20px;
-  inset-inline-start: 50%;
+  bottom: 30px;
+  left: 50%;
   transform: translateX(-50%);
   display: inline-flex;
   align-items: center;
@@ -332,7 +337,7 @@ h1, h2, h3 {
 .section-block,
 .method-section,
 .sources-section {
-  margin-top: 64px;
+  margin-top: 140px;
   animation: fadeUp 700ms var(--ease) both;
 }
 
@@ -1094,7 +1099,6 @@ h3 {
 .deficit-list svg { color: var(--on-red-3); }
 
 .flow-card {
-  min-height: 340px;
   display: flex;
   flex-direction: column;
 }
@@ -1103,7 +1107,7 @@ h3 {
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 10px;
-  margin-top: auto;
+  margin-top: 16px;
 }
 
 .flow-step {
@@ -1585,8 +1589,8 @@ h3 {
 }
 
 @keyframes bobble {
-  0%, 100% { transform: translate(-50%, 0); }
-  50% { transform: translate(-50%, 6px); }
+  0%, 100% { transform: translateX(-50%) translateY(0); }
+  50% { transform: translateX(-50%) translateY(6px); }
 }
 
 .section-block { animation-delay: 60ms; }
