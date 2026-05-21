@@ -347,6 +347,7 @@ function App() {
 
   const activityLabel = activityLevels[activityIdx].label;
   const activeFormula = formulas.find((item) => item.id === result.effectiveFormula)?.label;
+  const ready = age !== "" && height !== "" && weight !== "" && Number(age) > 0 && Number(height) > 0 && Number(weight) > 0;
 
   return (
     <main className="site-shell">
@@ -380,14 +381,6 @@ function App() {
           <a href="#calculator" className="btn-primary">ابدأ الحساب <ArrowUpRight size={16} /></a>
           <a href="#learn" className="btn-ghost">اقرأ الشرح</a>
         </div>
-        <ul className="hero-features">
-          {heroFeatures.map(({ icon: Icon, label }) => (
-            <li key={label}>
-              <Icon size={14} />
-              <span>{label}</span>
-            </li>
-          ))}
-        </ul>
         <a href="#calculator" className="hero-scroll" aria-label="انزل للحاسبة">
           <ChevronDown size={18} />
         </a>
@@ -405,7 +398,7 @@ function App() {
               <span className="card-icon"><Calculator size={20} /></span>
               <div>
                 <h3>بياناتك</h3>
-                <p>BMR ← TDEE ← أهداف العجز.</p>
+                <p>عبّئ الحقول لمعرفة سعراتك اليومية وأهداف الخسارة.</p>
               </div>
             </div>
 
@@ -461,47 +454,63 @@ function App() {
           </section>
 
           <RedSurface className="result-card" seed={21} aria-label="نتائج الحاسبة">
-            <div className="result-hero">
-              <span>احتياجك اليومي</span>
-              <AnimatedValue value={result.maintenance} suffix=" سعرة" />
-              <p>{activityLabel}، باستخدام {activeFormula}.</p>
-            </div>
+            {ready ? (
+              <>
+                <div className="result-hero">
+                  <span>سعراتك اليومية للحفاظ على الوزن</span>
+                  <AnimatedValue value={result.maintenance} suffix=" سعرة" />
+                  <p>{activityLabel}، باستخدام {activeFormula}.</p>
+                </div>
 
-            <div className="result-table">
-              <div>
-                <span>BMR <small>معدل الأيض الأساسي</small></span>
-                <b>{formatNumber(result.bmr)}</b>
-              </div>
-              <div>
-                <span>عجز خفيف <small>~0.25 كجم/أسبوع</small></span>
-                <b>{formatNumber(result.mild)}</b>
-              </div>
-              <div>
-                <span>عجز متوسط <small>~0.5 كجم/أسبوع</small></span>
-                <b>{formatNumber(result.moderate)}</b>
-              </div>
-              <div>
-                <span>حد أعلى <small>~1 كجم/أسبوع</small></span>
-                <b>{formatNumber(result.upper)}</b>
-              </div>
-            </div>
+                <div className="result-table">
+                  <div>
+                    <span>سعرات الراحة <small>ما يحرقه جسمك دون أي نشاط</small></span>
+                    <b>{formatNumber(result.bmr)}</b>
+                  </div>
+                  <div>
+                    <span>خسارة بطيئة <small>تقريباً ربع كيلو في الأسبوع</small></span>
+                    <b>{formatNumber(result.mild)}</b>
+                  </div>
+                  <div>
+                    <span>خسارة متوسطة <small>تقريباً نصف كيلو في الأسبوع</small></span>
+                    <b>{formatNumber(result.moderate)}</b>
+                  </div>
+                  <div>
+                    <span>خسارة سريعة <small>كيلو في الأسبوع — متطرف، استشر مختصاً</small></span>
+                    <b>{formatNumber(result.upper)}</b>
+                  </div>
+                </div>
 
-            <div className="macro-row">
-              <div>
-                <span>بروتين</span>
-                <b>{result.proteinG}<i>غ</i></b>
-              </div>
-              <div>
-                <span>دهون</span>
-                <b>{result.fatG}<i>غ</i></b>
-              </div>
-              <div>
-                <span>كربوهيدرات</span>
-                <b>{result.carbG}<i>غ</i></b>
-              </div>
-            </div>
+                <div className="macro-row">
+                  <div>
+                    <span>بروتين</span>
+                    <b>{result.proteinG}<i>غ</i></b>
+                  </div>
+                  <div>
+                    <span>دهون</span>
+                    <b>{result.fatG}<i>غ</i></b>
+                  </div>
+                  <div>
+                    <span>كربوهيدرات</span>
+                    <b>{result.carbG}<i>غ</i></b>
+                  </div>
+                </div>
 
-            <BmiGauge bmi={result.bmi} />
+                <BmiGauge bmi={result.bmi} />
+              </>
+            ) : (
+              <div className="result-empty">
+                <span className="empty-icon"><Sparkles size={28} /></span>
+                <h3>ابدأ بإدخال بياناتك</h3>
+                <p>عبّئ العمر والطول والوزن في اليمين، وستظهر نتائجك هنا فوراً.</p>
+                <ul>
+                  <li><CheckCircle2 size={14} /> سعراتك اليومية</li>
+                  <li><CheckCircle2 size={14} /> أهداف خسارة الوزن</li>
+                  <li><CheckCircle2 size={14} /> توزيع البروتين والكربوهيدرات</li>
+                  <li><CheckCircle2 size={14} /> مؤشر كتلة الجسم</li>
+                </ul>
+              </div>
+            )}
           </RedSurface>
         </div>
       </section>
