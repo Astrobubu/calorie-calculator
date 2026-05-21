@@ -1201,7 +1201,6 @@ h3 {
 .site-footer {
   position: relative;
   margin-top: 110px;
-  padding-bottom: 60px;
 }
 
 /* Empty state inside the red result card */
@@ -1555,9 +1554,9 @@ h3 {
   font-weight: 900;
   line-height: 0.92;
   letter-spacing: -0.05em;
-  background-color: #858585;
-  color: transparent;
-  text-shadow: 0px 1px 3px rgb(255 255 255 / 80%);
+  background-color: #8b8875;
+  color: #00000000;
+  text-shadow: 0px 1px 6px rgb(255 255 255 / 80%);
   background-clip: text;
   -webkit-background-clip: text;
   animation: watermarkRise 1200ms var(--ease) 300ms both;
