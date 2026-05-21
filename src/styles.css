@@ -1660,7 +1660,7 @@ h3 {
     padding-top: 14px;
   }
   .topbar { margin-bottom: 24px; }
-  .hero-section { padding: 28px 0 100px; min-height: auto; }
+  .hero-section { padding: 40px 0 80px; min-height: calc(100vh - 80px); }
   .hero-section h1 { font-size: 32px; }
   .section-heading h2 { font-size: 26px; }
   .field-grid,
