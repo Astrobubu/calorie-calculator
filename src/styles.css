@@ -40,14 +40,44 @@
 
 html {
   scroll-behavior: smooth;
-  overflow-x: hidden;
+  overflow-x: clip;
   direction: ltr;
+  scrollbar-color: #d11a1a transparent;
+  scrollbar-width: thin;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #d11a1a;
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #ff3535;
+}
+
+::-webkit-scrollbar-button {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+::-webkit-scrollbar-corner {
+  background: transparent;
 }
 
 body {
   margin: 0;
   min-width: 320px;
-  overflow-x: hidden;
+  overflow-x: clip;
   direction: ltr;
   background-color: var(--bg);
   background-image:
@@ -186,7 +216,7 @@ h1, h2, h3 {
 .hero-line {
   display: block;
   opacity: 0;
-  transform: translateY(-90px) rotate(-3deg);
+  transform: translateY(-90px);
   animation: dropIn 950ms var(--bounce) forwards;
 }
 
@@ -338,7 +368,6 @@ h1, h2, h3 {
 .method-section,
 .sources-section {
   margin-top: 140px;
-  animation: fadeUp 700ms var(--ease) both;
 }
 
 .section-heading {
@@ -1578,9 +1607,9 @@ h3 {
 }
 
 @keyframes dropIn {
-  0% { opacity: 0; transform: translateY(-90px) rotate(-3deg); }
+  0% { opacity: 0; transform: translateY(-90px); }
   60% { opacity: 1; }
-  100% { opacity: 1; transform: translateY(0) rotate(0); }
+  100% { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes watermarkRise {
@@ -1593,10 +1622,6 @@ h3 {
   50% { transform: translateX(-50%) translateY(6px); }
 }
 
-.section-block { animation-delay: 60ms; }
-.method-section { animation-delay: 100ms; }
-.sources-section { animation-delay: 140ms; }
-.site-footer { animation: fadeUp 800ms var(--ease) 180ms both; }
 
 /* ---------- RESPONSIVE ---------- */
 @media (max-width: 1080px) {
@@ -1612,6 +1637,7 @@ h3 {
   .method-section {
     grid-template-columns: 1fr;
   }
+  .hero-section h1 { line-height: 1.15; font-size: clamp(34px, 7vw, 60px); }
   .learn-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .calculation-flow { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .footer-grid {
@@ -1632,8 +1658,8 @@ h3 {
     padding-top: 14px;
   }
   .topbar { margin-bottom: 24px; }
-  .hero-section { padding: 28px 0 100px; }
-  .hero-section h1 { font-size: 30px; }
+  .hero-section { padding: 28px 0 100px; min-height: auto; }
+  .hero-section h1 { font-size: 32px; line-height: 1.18; }
   .section-heading h2 { font-size: 26px; }
   .field-grid,
   .formula-list,
