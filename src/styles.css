@@ -1653,8 +1653,10 @@ h3 {
 }
 
 @media (max-width: 640px) {
+  body { padding: 0 12px; }
   .site-shell {
-    width: calc(100vw - 24px);
+    width: 100%;
+    max-width: 100%;
     padding-top: 14px;
   }
   .topbar { margin-bottom: 24px; }
@@ -1678,6 +1680,7 @@ h3 {
   .footer-shell { padding: 32px 18px 24px; border-radius: 26px; }
   .footer-heading h2 { font-size: 26px; }
   .footer-meta { flex-direction: column; align-items: flex-start; gap: 8px; }
-  .footer-watermark { height: 90px; margin-top: -24px; }
-  .site-footer { padding-bottom: 60px; }
+  .footer-watermark { height: 90px; margin-top: 40px; }
+  .footer-watermark span { font-size: clamp(96px, 30vw, 140px); }
+  .site-footer { padding-bottom: 0; }
 }
