@@ -7,20 +7,15 @@ import {
   Calculator,
   CheckCircle2,
   ChevronDown,
-  Facebook,
   Gauge,
   HeartPulse,
   Info,
-  Instagram,
-  Linkedin,
   Scale,
   ShieldAlert,
   Sparkles,
   Target,
   TrendingDown,
-  Twitter,
   Utensils,
-  Zap,
 } from "lucide-react";
 import "./styles.css";
 
@@ -64,18 +59,10 @@ const sources = [
   ["Hall et al. 2011 energy imbalance, PubMed 21872751", "https://pubmed.ncbi.nlm.nih.gov/21872751/"],
 ];
 
-const footerLinks = [
-  { title: "الحاسبة", items: ["السعرات", "الثبات", "العجز", "BMI"] },
-  { title: "تعلّم", items: ["السمنة", "الأيض", "النشاط", "التغذية"] },
-  { title: "الموقع", items: ["من نحن", "تواصل", "الأسئلة", "المدونة"] },
-  { title: "قانوني", items: ["الخصوصية", "الاستخدام", "إخلاء طبي", "الكوكيز"] },
-];
-
-const heroFeatures = [
-  { icon: Zap, label: "حساب فوري" },
-  { icon: CheckCircle2, label: "بدون تسجيل" },
-  { icon: Sparkles, label: "3 معادلات علمية" },
-  { icon: BookOpenText, label: "مصادر طبية" },
+const beginnerSteps = [
+  { icon: Scale, title: "نحسب حرق جسمك", desc: "العمر والطول والوزن يعطون تقديراً لسعرات الراحة." },
+  { icon: Activity, title: "نضيف نشاطك", desc: "نضرب الرقم بمعامل الحركة اليومي للوصول لسعرات الثبات." },
+  { icon: Target, title: "نحدد العجز", desc: "تأكل أقل من الثبات بقدر معقول حتى ينزل الوزن تدريجياً." },
 ];
 
 const formatter = new Intl.NumberFormat("ar-AE", { maximumFractionDigits: 0 });
@@ -305,16 +292,17 @@ function App() {
   const [activityIdx, setActivityIdx] = useState(3);
   const [formula, setFormula] = useState("mifflin");
   const [bodyFat, setBodyFat] = useState("");
-  const [email, setEmail] = useState("");
+  const [showAdvanced, setShowAdvanced] = useState(false);
 
   const activity = activityLevels[activityIdx].value;
+  const hasBodyFat = bodyFat !== "" && Number(bodyFat) > 0;
 
   const result = useMemo(() => {
     const safeAge = clamp(Number(age) || 25, 15, 80);
     const safeHeight = clamp(Number(height) || 180, 100, 230);
     const safeWeight = clamp(Number(weight) || 75, 35, 250);
-    const safeBodyFat = clamp(Number(bodyFat) || 20, 3, 70);
-    const effectiveFormula = formula === "katch" && !safeBodyFat ? "mifflin" : formula;
+    const safeBodyFat = hasBodyFat ? clamp(Number(bodyFat), 3, 70) : null;
+    const effectiveFormula = formula === "katch" && !hasBodyFat ? "mifflin" : formula;
     const bmr = calculateBmr({
       formula: effectiveFormula,
       gender,
@@ -343,11 +331,12 @@ function App() {
       fatG,
       carbG,
     };
-  }, [age, gender, height, weight, activity, formula, bodyFat]);
+  }, [age, gender, height, weight, activity, formula, bodyFat, hasBodyFat]);
 
   const activityLabel = activityLevels[activityIdx].label;
   const activeFormula = formulas.find((item) => item.id === result.effectiveFormula)?.label;
   const ready = age !== "" && height !== "" && weight !== "" && Number(age) > 0 && Number(height) > 0 && Number(weight) > 0;
+  const formulaFallback = formula === "katch" && !hasBodyFat;
 
   return (
     <main className="site-shell">
@@ -381,6 +370,15 @@ function App() {
           <a href="#calculator" className="btn-primary">ابدأ الحساب <ArrowUpRight size={16} /></a>
           <a href="#learn" className="btn-ghost">اقرأ الشرح</a>
         </div>
+        <div className="beginner-steps" aria-label="شرح سريع">
+          {beginnerSteps.map(({ icon: Icon, title, desc }) => (
+            <div className="beginner-step" key={title}>
+              <span><Icon size={16} /></span>
+              <b>{title}</b>
+              <p>{desc}</p>
+            </div>
+          ))}
+        </div>
         <a href="#calculator" className="hero-scroll" aria-label="انزل للحاسبة">
           <ChevronDown size={18} />
         </a>
@@ -389,7 +387,7 @@ function App() {
       <section className="section-block" id="calculator">
         <div className="section-heading">
           <h2>الحاسبة</h2>
-          <p>أدخل بياناتك، اختر النشاط والمعادلة، وستحدّث النتيجة مباشرة.</p>
+          <p>أدخل بياناتك واختر نشاطك. المعادلات المتقدمة موجودة لمن يريدها فقط.</p>
         </div>
 
         <div className="calculator-layout">
@@ -418,34 +416,45 @@ function App() {
               <NumberField label="العمر" value={age} placeholder="25" min={15} max={80} unit="سنة" onChange={setAge} />
               <NumberField label="الطول" value={height} placeholder="180" min={100} max={230} unit="سم" onChange={setHeight} />
               <NumberField label="الوزن" value={weight} placeholder="75" min={35} max={250} unit="كجم" onChange={setWeight} />
-              <NumberField label="دهون الجسم" value={bodyFat} placeholder="20" min={3} max={70} unit="%" onChange={setBodyFat} />
+              <NumberField label="دهون الجسم (اختياري)" value={bodyFat} placeholder="20" min={3} max={70} unit="%" onChange={setBodyFat} />
             </div>
 
             <ActivitySlider index={activityIdx} onChange={setActivityIdx} />
 
-            <div className="formula-block">
-              <div className="formula-block-head">
-                <b>المعادلة</b>
-                <small>مرّر فوق أي معادلة للشرح.</small>
-              </div>
+            <details className="formula-block" open={showAdvanced} onToggle={(event) => setShowAdvanced(event.currentTarget.open)}>
+              <summary>
+                <span>
+                  <b>إعدادات متقدمة</b>
+                  <small>المعادلة الافتراضية مناسبة لمعظم الناس.</small>
+                </span>
+                <ChevronDown size={16} />
+              </summary>
               <div className="formula-list" aria-label="اختيار المعادلة">
-                {formulas.map((item) => (
-                  <button
-                    type="button"
-                    key={item.id}
-                    className={formula === item.id ? "formula-btn active" : "formula-btn"}
-                    onClick={() => setFormula(item.id)}
-                  >
-                    <span className="formula-btn-top">
-                      <b>{item.label}</b>
-                      <Info size={13} className="formula-info" />
-                    </span>
-                    <span className="formula-btn-note">{item.note}</span>
-                    <span className="formula-tooltip" role="tooltip">{item.desc}</span>
-                  </button>
-                ))}
+                {formulas.map((item) => {
+                  const needsBodyFat = item.id === "katch" && !hasBodyFat;
+                  return (
+                    <button
+                      type="button"
+                      key={item.id}
+                      className={formula === item.id ? "formula-btn active" : "formula-btn"}
+                      onClick={() => setFormula(item.id)}
+                    >
+                      <span className="formula-btn-top">
+                        <b>{item.label}</b>
+                        <Info size={13} className="formula-info" />
+                      </span>
+                      <span className="formula-btn-note">{needsBodyFat ? "يتطلب نسبة الدهون" : item.note}</span>
+                      <span className="formula-tooltip" role="tooltip">{item.desc}</span>
+                    </button>
+                  );
+                })}
               </div>
-            </div>
+              {formulaFallback && (
+                <p className="formula-warning">
+                  أضف نسبة دهون الجسم لاستخدام Katch-McArdle. حالياً نستخدم Mifflin-St Jeor تلقائياً.
+                </p>
+              )}
+            </details>
 
             <div className="input-foot">
               <CheckCircle2 size={14} />
@@ -460,6 +469,14 @@ function App() {
                   <span>سعراتك اليومية للحفاظ على الوزن</span>
                   <AnimatedValue value={result.maintenance} suffix=" سعرة" />
                   <p>{activityLabel}، باستخدام {activeFormula}.</p>
+                </div>
+
+                <div className="result-advice">
+                  <b>ماذا تفعل بهذا الرقم؟</b>
+                  <p>
+                    ابدأ تقريباً بـ {formatNumber(result.moderate)} سعرة يومياً لمدة أسبوعين،
+                    ثم راقب متوسط وزنك. إذا لم ينزل الوزن، خفّض 100-150 سعرة أو زد الحركة.
+                  </p>
                 </div>
 
                 <div className="result-table">
@@ -502,7 +519,7 @@ function App() {
               <div className="result-empty">
                 <span className="empty-icon"><Sparkles size={28} /></span>
                 <h3>ابدأ بإدخال بياناتك</h3>
-                <p>عبّئ العمر والطول والوزن في اليمين، وستظهر نتائجك هنا فوراً.</p>
+                <p>عبّئ العمر والطول والوزن، وستظهر نتائجك هنا فوراً.</p>
                 <ul>
                   <li><CheckCircle2 size={14} /> سعراتك اليومية</li>
                   <li><CheckCircle2 size={14} /> أهداف خسارة الوزن</li>
@@ -518,7 +535,7 @@ function App() {
       <section className="section-block" id="learn">
         <div className="section-heading">
           <h2>السمنة، BMI، وعجز السعرات</h2>
-          <p>الأساسيات في أربع بطاقات قصيرة.</p>
+          <p>الأساسيات بلغة بسيطة لشخص يبدأ من الصفر.</p>
         </div>
 
         <div className="learn-grid">
@@ -527,7 +544,7 @@ function App() {
             <h3>ما هي السمنة؟</h3>
             <p>
               تراكم زائد للدهون قد يؤثر في الصحة. BMI أداة فرز للنطاق العام،
-              لكنها لا تصف كل تفاصيل الجسم.
+              لكنها لا تصف كل تفاصيل الجسم مثل العضلات أو توزيع الدهون.
             </p>
           </article>
           <article className="app-card learn-card">
@@ -535,7 +552,7 @@ function App() {
             <h3>لماذا هي خطيرة؟</h3>
             <p>
               ترتبط بالسكري من النوع الثاني، أمراض القلب، ارتفاع الضغط،
-              ومشكلات التنفس والمفاصل.
+              ومشكلات التنفس والمفاصل. الخطر يزيد غالباً مع زيادة محيط الخصر ومدة زيادة الوزن.
             </p>
           </article>
           <article className="app-card learn-card">
@@ -543,7 +560,7 @@ function App() {
             <h3>زيادة الوزن</h3>
             <p>
               ليست حكماً نهائياً على الصحة، لكنها علامة تستحق خطة غذاء
-              ونشاط قابلة للاستمرار.
+              ونشاط قابلة للاستمرار، خصوصاً إذا كانت الطاقة اليومية أعلى من احتياجك لفترة طويلة.
             </p>
           </article>
           <article className="app-card learn-card">
@@ -551,7 +568,39 @@ function App() {
             <h3>مؤشر BMI</h3>
             <p>
               الوزن بالكيلوجرام على مربع الطول بالمتر. طبيعي 18.5–24.9،
-              زيادة من 25، سمنة من 30.
+              زيادة من 25، وسمنة من 30. استخدمه كبداية، لا كتشخيص كامل.
+            </p>
+          </article>
+          <article className="app-card learn-card">
+            <span className="card-icon"><Utensils size={20} /></span>
+            <h3>ما معنى الثبات؟</h3>
+            <p>
+              هو عدد السعرات الذي غالباً يحافظ على وزنك الحالي. إذا كان ثباتك 2400،
+              فأكل 1900 تقريباً يعني عجز 500 سعرة.
+            </p>
+          </article>
+          <article className="app-card learn-card">
+            <span className="card-icon"><Target size={20} /></span>
+            <h3>العجز المناسب</h3>
+            <p>
+              ابدأ بعجز 250-500 سعرة. النزول الأسرع ليس دائماً أفضل؛ المهم أن تستطيع الالتزام
+              وتحافظ على البروتين والنوم والحركة.
+            </p>
+          </article>
+          <article className="app-card learn-card">
+            <span className="card-icon"><Activity size={20} /></span>
+            <h3>كيف تتابع؟</h3>
+            <p>
+              زن نفسك عدة مرات في الأسبوع وخذ المتوسط. الماء والملح والوجبات الكبيرة
+              قد يغيرون الرقم يومياً بدون تغير حقيقي في الدهون.
+            </p>
+          </article>
+          <article className="app-card learn-card">
+            <span className="card-icon"><ShieldAlert size={20} /></span>
+            <h3>متى تنتبه؟</h3>
+            <p>
+              استشر مختصاً إذا كنت أقل من 18 سنة، حاملاً، لديك سكري أو أدوية مؤثرة،
+              أو تاريخ مع اضطرابات الأكل.
             </p>
           </article>
         </div>
@@ -567,12 +616,12 @@ function App() {
             <h2>كيف تخسر الوزن؟</h2>
             <p>
               عجز 250–500 سعرة يومياً، بروتين كافٍ، وألياف.
-              لا تجعل العجز الكبير خطتك الأساسية.
+              لا تجعل العجز الكبير خطتك الأساسية، واجعل الخطة قابلة للتكرار لا مثالية على الورق فقط.
             </p>
             <ul className="deficit-list">
               <li><TrendingDown size={14} /> 7700 سعرة ≈ كيلو دهون</li>
-              <li><Activity size={14} /> النشاط أهم من الحساب الدقيق</li>
-              <li><Utensils size={14} /> راقب الوزن أسبوعياً، لا يومياً</li>
+              <li><Activity size={14} /> المشي والتمارين تساعدك تحفظ العضلات وتزيد الصرف</li>
+              <li><Utensils size={14} /> ارفع البروتين والخضار لتشبع أكثر داخل نفس السعرات</li>
             </ul>
           </div>
         </RedSurface>
@@ -595,66 +644,37 @@ function App() {
         </div>
       </section>
 
-      <section className="sources-section" id="sources">
-        <div className="section-heading">
-          <h2>المصادر العلمية</h2>
-          <p>الصيغ والتعريفات من مراجع منشورة.</p>
-        </div>
-        <div className="sources-card">
-          <div className="source-list">
-            {sources.map(([title, href], index) => (
-              <a key={href} href={href} target="_blank" rel="noreferrer">
-                <span>{String(index + 1).padStart(2, "0")}</span>
-                <b>{title}</b>
-                <ArrowUpRight size={14} className="source-arrow" />
-              </a>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <footer className="site-footer">
+      <footer className="site-footer" id="sources">
         <div className="footer-shell">
           <div className="footer-heading">
-            <h2>ابدأ رحلتك نحو وزن أكثر صحة</h2>
+            <h2>المصادر والتنبيه الطبي</h2>
             <p>
-              انضم لآلاف يحسبون سعراتهم بشكل صحيح. أقل من دقيقتين،
-              بدون حسابات معقدة وبدون بيانات.
+              الأرقام تقديرية للتثقيف ومتابعة العادات، وليست تشخيصاً طبياً أو خطة علاجية.
             </p>
           </div>
 
           <div className="footer-grid">
-            <RedSurface className="subscribe-card" seed={11}>
+            <RedSurface className="footer-summary-card" seed={11}>
               <div className="subscribe-top">
                 <span className="brand">
                   <BrandMark size={24} />
                   <b>سعرات</b>
                 </span>
               </div>
-              <div className="subscribe-bottom">
-                <label htmlFor="footer-email">اشترك ليصلك الجديد :</label>
-                <form className="subscribe-form" onSubmit={(e) => e.preventDefault()}>
-                  <input
-                    id="footer-email"
-                    type="email"
-                    placeholder="بريدك الإلكتروني"
-                    value={email}
-                    onChange={(event) => setEmail(event.target.value)}
-                  />
-                  <button type="submit">اشترك</button>
-                </form>
+              <div className="footer-summary-bottom">
+                <h3>الطريقة باختصار</h3>
+                <p>نحسب BMR، نضربه بالنشاط، ثم نطرح عجزاً مناسباً لخسارة وزن تدريجية.</p>
               </div>
             </RedSurface>
 
-            <div className="footer-links-card">
-              <div className="footer-links">
-                {footerLinks.map((col) => (
-                  <div className="link-col" key={col.title}>
-                    <b>{col.title}</b>
-                    {col.items.map((item) => (
-                      <a href="#" key={item}>{item}</a>
-                    ))}
-                  </div>
+            <div className="footer-sources-card">
+              <div className="footer-source-list">
+                {sources.map(([title, href], index) => (
+                  <a key={href} href={href} target="_blank" rel="noreferrer">
+                    <span>{String(index + 1).padStart(2, "0")}</span>
+                    <b>{title}</b>
+                    <ArrowUpRight size={14} />
+                  </a>
                 ))}
               </div>
             </div>
@@ -668,16 +688,9 @@ function App() {
             <div className="footer-support-card">
               <div className="footer-support">
                 <p>
-                  <span>فريق الدعم جاهز لمساعدتك </span>
-                  <b>في أي وقت. تواصل معنا.</b>
+                  <span>استشر طبيباً أو أخصائي تغذية إذا لديك حالة صحية، أدوية مؤثرة، حمل، أو تاريخ مع اضطرابات الأكل. </span>
+                  <b>ابدأ بهدوء وراقب المتوسطات، لا رقم يوم واحد.</b>
                 </p>
-                <div className="socials">
-                  <span>تابعنا</span>
-                  <a href="#" aria-label="LinkedIn"><Linkedin size={16} /></a>
-                  <a href="#" aria-label="Facebook"><Facebook size={16} /></a>
-                  <a href="#" aria-label="Twitter"><Twitter size={16} /></a>
-                  <a href="#" aria-label="Instagram"><Instagram size={16} /></a>
-                </div>
               </div>
               <div className="footer-meta">
                 <span>© 2026 سعرات. جميع الحقوق محفوظة.</span>
