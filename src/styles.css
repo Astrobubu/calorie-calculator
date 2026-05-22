@@ -1738,6 +1738,10 @@ h3 {
   .footer-heading h2 { font-size: 26px; }
   .footer-meta { flex-direction: column; align-items: flex-start; gap: 8px; }
   .footer-watermark { height: 90px; margin-top: 40px; }
-  .footer-watermark span { font-size: clamp(96px, 30vw, 140px); }
+  .footer-watermark span {
+    font-size: clamp(96px, 26vw, 120px);
+    line-height: 1.192;
+    transform: translateY(24px);
+  }
   .site-footer { padding-bottom: 0; }
 }
